@@ -1,62 +1,73 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="topContainer">
-    <h1>UPS Manager</h1>
+<div class="splitCol">
+    <div class="top">
+        <h1 class="title">UPS Manager</h1>
 
-    <div class="gagueCluster">
-        <div class="gague">
-            <h1><b>Total Power</b></h1>
-            <canvas id="totalPower"></canvas>
-            <h2>{{metrics.totalUsage//1}}w</h2>
+        <div class="splitRow">
+
+            <div class="gagueCluster left">
+                <div class="gague">
+                    <h1><b>Total Power</b></h1>
+                    <canvas id="totalPower"></canvas>
+                    <h2>{{metrics.totalUsage//1}}w</h2>
+                </div>
+            </div>
+
+            <div class="metricCluster right">
+                <div class="metric">
+                    <h1><b>Lowest Runtime</b></h1>
+                    <h2>{{metrics.runtime//60}} mins</h2>
+                </div>
+                <div class="metric">
+                    <h1><b>Average Charge</b></h1>
+                    <h2>{{metrics.charge}}%</h2>
+                </div>
+                
+            </div>
+            
         </div>
-        <div class="gague">
-            <h1><b>Expected Runtime</b></h1>
-            <h2>{{metrics.runtime//60}} mins</h2>
-        </div>
-        
+    </div>
+
+    <div class="bottom">
+        <h3>Detected UPS Units</h3>
+        <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">UPS Name</th>
+                <th scope="col">Usage</th>
+                <th scope="col">Runtime</th>
+                <th scope="col">Battery Charge</th>
+                <th scope="col">Status</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+    
+            {% for ups in units %}
+                <tr>
+                    <th scope="row">{{ups.name}}</th>
+                    <td>
+                        {% if ups.load == False %}
+                            No Data
+                        {% else %}
+                            {{ ups.load//1 }} watts
+                        {% endif %}
+                    </td>
+                    <td>{{ ups.runtime//60 }} minutes</td>
+                    <td>{{ ups.charge }}%</td>
+                    <td>{{ ups.status }} </td>
+                    <td class="actions">
+                        <a href="#edit"><i class="bi bi-pencil"></i></a>
+                        <a href="#edit" class="text-danger"><i class="bi bi-arrow-clockwise"></i></a>
+                    </svg>
+                </tr>
+            {% endfor %}
+            </tbody>
+          </table>
     </div>
 </div>
-  
-
-<div class="bottomContainer">
-    <h3>Detected UPS Units</h3>
-    <table class="table">
-        <thead>
-          <tr>
-            <th scope="col">UPS Name</th>
-            <th scope="col">Usage</th>
-            <th scope="col">Runtime</th>
-            <th scope="col">Battery Charge</th>
-            <th scope="col">Status</th>
-            <th scope="col">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-
-        {% for ups in units %}
-            <tr>
-                <th scope="row">{{ups.name}}</th>
-                <td>
-                    {% if ups.load == False %}
-                        No Data
-                    {% else %}
-                        {{ ups.load//1 }} watts
-                    {% endif %}
-                </td>
-                <td>{{ ups.runtime//60 }} minutes</td>
-                <td>{{ ups.charge }}%</td>
-                <td>{{ ups.status }} </td>
-                <td class="actions">
-                    <a href="#edit"><i class="bi bi-pencil"></i></a>
-                    <a href="#edit" class="text-danger"><i class="bi bi-arrow-clockwise"></i></a>
-                </svg>
-            </tr>
-        {% endfor %}
-        </tbody>
-      </table>
-</div>
-
 <script type="text/javascript">
 
     function getOpts(color){

@@ -59,17 +59,27 @@ def hello():
     units = []
     metrics = {
         "totalUsage": 0,
-        "runtime": 200000000000000000000
+        "runtime": 0,
+        "charge": 0
     }
 
     for i in getUnits():
         values = getUPSValues(i)
 
         metrics["totalUsage"] = metrics["totalUsage"] + values.get("load")
-
-        if metrics["runtime"] > values.get("runtime"):
-            metrics["runtime"] = values.get("runtime")
+        metrics["charge"] = metrics["charge"] + values.get("charge")
 
         units.append(values)
 
+    metrics["charge"] = metrics["charge"] / len(units)
+    units.sort(reverse=False, key=lambda unit: unit["runtime"])
+    metrics["runtime"] = units[0]["runtime"]
+
     return render_template('index.html', units=units, metrics=metrics)
+
+
+if __name__ == "__main__":
+    if os.getenv("DEBUG") == "true":
+        app.run(port=8000, debug=True)
+    else:
+        app.run(port=8000)

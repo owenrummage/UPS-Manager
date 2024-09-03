@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="topContainer">
+    <h1>UPS Manager</h1>
+
+    <div class="gagueCluster">
+        <div class="gague">
+            <h1><b>Total Power</b></h1>
+            <canvas id="totalPower"></canvas>
+            <h2>{{metrics.totalUsage//1}}w</h2>
+        </div>
+        <div class="gague">
+            <h1><b>Expected Runtime</b></h1>
+            <h2>{{metrics.runtime//60}} mins</h2>
+        </div>
+        
+    </div>
+</div>
+  
+
+<div class="bottomContainer">
+    <h3>Detected UPS Units</h3>
+    <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">UPS Name</th>
+            <th scope="col">Usage</th>
+            <th scope="col">Runtime</th>
+            <th scope="col">Battery Charge</th>
+            <th scope="col">Status</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+
+        {% for ups in units %}
+            <tr>
+                <th scope="row">{{ups.name}}</th>
+                <td>
+                    {% if ups.load == False %}
+                        No Data
+                    {% else %}
+                        {{ ups.load//1 }} watts
+                    {% endif %}
+                </td>
+                <td>{{ ups.runtime//60 }} minutes</td>
+                <td>{{ ups.charge }}%</td>
+                <td>{{ ups.status }} </td>
+                <td class="actions">
+                    <a href="#edit"><i class="bi bi-pencil"></i></a>
+                    <a href="#edit" class="text-danger"><i class="bi bi-arrow-clockwise"></i></a>
+                </svg>
+            </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+</div>
+
+<script type="text/javascript">
+
+    function getOpts(color){
+        return {
+            angle: 0.35, // The span of the gauge arc
+            lineWidth: 0.1, // The line thickness
+            radiusScale: 1, // Relative radius
+            pointer: {
+                length: 0.6, // // Relative to gauge radius
+                strokeWidth: 0.035, // The thickness
+                color: '#000000' // Fill color
+            },
+            limitMax: false,     // If false, max value increases automatically if value > maxValue
+            limitMin: false,     // If true, the min value of the gauge will be fixed
+            colorStart: color ? "#14A44D" : "#DC4C64",   // Colors
+            colorStop: color ? "#14A44D" : "#DC4C64",    // just experiment with them
+            strokeColor: '#EEEEEE',  // to see which ones work best for you
+            generateGradient: true,
+            highDpiSupport: true,     // High resolution support            
+        }
+    };
+    var totalPower = document.getElementById('totalPower'); // your canvas element
+    var timeToDead = document.getElementById('timeToDead'); // your canvas element
+
+    var totalPowerGague = new Donut(totalPower).setOptions(getOpts(true)); // create sexy gauge!
+    totalPowerGague.maxValue = 1800; // set max gauge value
+    totalPowerGague.set({{metrics.totalUsage}}); // set actual value
+</script>
+{% endblock %}
